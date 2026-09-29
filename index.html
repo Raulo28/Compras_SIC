@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De compras – SIC</title>
+<style>
+:root{--bg:#eaf0f6;--card:#fff;--tx:#17213b;--mut:#56617d;--pri:#0f766e;--pri2:#0b5a54;--ok:#15803d;--bad:#b91c1c;--bd:#cfd8e6;--floor:#dbe4ef;--tag:#f59e0b;--bub:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--card:#18233a;--tx:#e9eefb;--mut:#9fb0d0;--pri:#2dd4bf;--pri2:#5eead4;--ok:#4ade80;--bad:#f87171;--bd:#2b3957;--floor:#1c2a45;--bub:#22314f}}
+:root[data-theme="dark"]{--bg:#0e1626;--card:#18233a;--tx:#e9eefb;--mut:#9fb0d0;--pri:#2dd4bf;--pri2:#5eead4;--ok:#4ade80;--bad:#f87171;--bd:#2b3957;--floor:#1c2a45;--bub:#22314f}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.45 "Trebuchet MS",Verdana,system-ui,sans-serif;min-height:100%}
+main{max-width:720px;margin:0 auto;padding:14px}
+h1{font-size:1.25rem;margin:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.score{text-align:right;font-weight:700}
+.score b{font-size:1.6rem;color:var(--pri)}
+.snd{font:inherit;font-size:.8rem;margin-top:4px;color:var(--tx);background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:3px 9px;cursor:pointer}
+.snd:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;background:var(--pri);transition:width .4s,background .4s}
+.scene{background:var(--floor);border:2px solid var(--bd);border-radius:14px;padding:12px 10px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;position:relative;overflow:hidden}
+.sign{grid-column:1/-1;text-align:center;font-weight:700;color:var(--mut);font-size:.85rem}
+.who{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:170px}
+.bub{background:var(--bub);border:2px solid var(--bd);border-radius:12px;padding:8px 10px;font-size:.9rem;min-height:64px;width:100%;position:relative;margin-bottom:10px}
+.bub:after{content:"";position:absolute;bottom:-9px;left:50%;width:14px;height:14px;background:var(--bub);border-right:2px solid var(--bd);border-bottom:2px solid var(--bd);transform:translateX(-50%) rotate(45deg)}
+.face{font-size:3.4rem;line-height:1}
+.role{font-size:.8rem;color:var(--mut);padding:2px 0 6px}
+.counter{grid-column:1/-1;height:16px;background:var(--pri);margin:0 -10px;border-top:3px solid var(--pri2)}
+.docs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;min-height:30px;align-items:center}
+.docs span{background:var(--tag);color:#1b1300;font-weight:700;font-size:.8rem;padding:3px 9px;border-radius:6px}
+.docs em{color:var(--mut);font-size:.85rem}
+.card{background:var(--card);border:2px solid var(--bd);border-radius:14px;padding:14px}
+.card h2{font-size:1.05rem;margin:0 0 10px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;color:var(--tx);background:var(--bg);border:2px solid var(--bd);border-radius:10px;padding:11px 12px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--pri)}
+.opt:focus-visible,.go:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--card));text-decoration:line-through}
+.opt.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--card))}
+.prod{display:flex;gap:10px;align-items:center}
+.prod .e{font-size:1.7rem}
+.fb{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:.95rem}
+.fb.ok{background:color-mix(in srgb,var(--ok) 15%,var(--card))}
+.fb.no{background:color-mix(in srgb,var(--bad) 13%,var(--card))}
+.go{font:inherit;font-weight:700;margin-top:10px;background:var(--pri);color:#fff;border:0;border-radius:10px;padding:11px 18px;cursor:pointer}
+:root:not([data-theme="light"]) .go{color:#06211d}
+.end{text-align:center}
+.end .big{font-size:3rem;font-weight:800;color:var(--pri)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h1>🛒 De compras<br><small style="font-weight:400;color:var(--mut)">Sistema de Información Contable</small></h1>
+    <div class="score">Puntaje<br><b id="sc">100%</b><br><button class="snd" id="snd" aria-pressed="false" aria-label="Silenciar sonido">🔊 Sonido</button></div>
+  </div>
+  <div class="bar"><i id="bar" style="width:100%"></i></div>
+  <div class="scene" aria-live="polite">
+    <div class="sign">ELECTRO HOGAR</div>
+    <div class="who"><div class="bub" id="mb"></div><div class="face">🧑‍💼</div><div class="role">Comerciante</div></div>
+    <div class="who"><div class="bub" id="bb"></div><div class="face">🙋</div><div class="role">Vos (comprador)</div></div>
+    <div class="counter"></div>
+  </div>
+  <div class="docs" id="docs"></div>
+  <div class="card" id="card"></div>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const PR={tv:{n:'TV LED 60"',e:'📺',big:1},hel:{n:'heladera',e:'🧊',big:1},cel:{n:'celular',e:'📱',big:0},coc:{n:'cocina',e:'🍳',big:0}};
+const Q=(t,o,w,d,s)=>({t,o,w,d,s});
+const FACT='En caja preparan el comprobante que acredita la compraventa, con importes, condiciones de pago e impuestos. ¿Cuál es?';
+const REC='Abonás en efectivo. ¿Qué constancia escrita te entregan por haber recibido el dinero?';
+const REM=n=>`Tu ${n} es voluminoso y se envía a tu domicilio. ¿Qué documento acompaña la entrega y certifica que recibiste la mercadería?`;
+
+function build1(p){
+  const a=[
+   Q(`Elegiste ${p.n}. Para formalizar tu pedido de compra al vendedor, ¿qué documento se usa?`,['Nota de pedido / Orden de compra','Remito','Recibo','Nota de crédito'],'La orden de compra o nota de pedido es la solicitud de mercadería que hace el comprador. No es registrable.','Orden de compra'),
+   Q(FACT,['Factura','Remito','Pagaré','Cheque'],'La factura acredita la compraventa de un bien o servicio.','Factura'),
+   Q('La factura, ¿es registrable o no registrable?',['Registrable: modifica el patrimonio y se anota en la contabilidad','No registrable: es solo una constancia previa','Ninguna: es un trámite interno sin efecto'],'Las facturas son registrables: modifican el patrimonio.',null)];
+  if(p.big) a.push(
+   Q(REM(p.n),['Remito','Factura','Nota de débito','Resumen de cuenta'],'El remito acompaña la entrega y certifica la recepción de la mercadería.','Remito'),
+   Q('Y el remito, ¿es registrable?',['No registrable: es constancia de entrega y no altera el patrimonio','Sí, porque acredita la compraventa','Sí, porque modifica el patrimonio'],'El remito no es registrable: no altera directamente el patrimonio.',null));
+  a.push(Q(REC,['Recibo','Remito','Orden de compra','Nota de débito'],'El recibo es la constancia escrita de haber recibido una suma de dinero.','Recibo'));
+  return a;
+}
+const NC=[
+  Q('Llegás a tu casa y el producto no te gusta. Volvés al local. ¿Qué documento emite el comerciante para reconocer la devolución y disminuir tu deuda?',['Nota de crédito','Nota de débito','Remito','Pagaré'],'La nota de crédito notifica una disminución en la deuda del cliente (devoluciones, bonificaciones, errores a su favor).','Nota de crédito',{m:'Sin problema, hagamos el cambio.',b:'No me gusta, quiero cambiarlo.'}),
+  Q('Si en cambio el comerciante hubiera olvidado cobrarte un gasto de envío, ¿qué documento emitiría?',['Nota de débito','Nota de crédito','Recibo','Orden de compra'],'La nota de débito notifica un aumento en la deuda (errores, intereses o gastos no contemplados).','Nota de débito')];
+function build2(p){
+  const a=[Q(`Elegiste ${p.n} para reemplazar tu compra. ¿Qué documento acredita esta nueva compraventa?`,['Factura','Nota de crédito','Recibo','Remito'],'Cada nueva compraventa se acredita con una factura.','Factura')];
+  if(p.big) a.push(Q(REM(p.n),['Remito','Nota de débito','Factura','Cheque'],'El remito certifica la recepción de la mercadería entregada.','Remito'));
+  a.push(Q(REC,['Recibo','Remito','Nota de crédito','Pagaré'],'El recibo deja constancia del dinero recibido.','Recibo'));
+  return a;
+}
+
+let AC=null,muted=false;
+try{muted=localStorage.getItem('sicmute')==='1'}catch(e){}
+function actx(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,t0,d,type,v){const a=actx();if(!a||muted)return;const o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.value=f;const s=a.currentTime+t0;g.gain.setValueAtTime(0.0001,s);g.gain.exponentialRampToValueAtTime(v||0.15,s+0.02);g.gain.exponentialRampToValueAtTime(0.0001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+0.05)}
+const SFX={
+ bell(){tone(1318,0,.5,'sine',.18);tone(1760,.12,.6,'sine',.14)},
+ ok(){tone(660,0,.15,'triangle');tone(880,.12,.2,'triangle');tone(1320,.25,.3,'triangle')},
+ bad(){tone(180,0,.3,'sawtooth',.12);tone(140,.15,.35,'sawtooth',.12)},
+ cash(){tone(2000,0,.08,'square',.06);tone(2600,.08,.25,'square',.06);tone(1320,.3,.3,'triangle',.14)},
+ win(){[523,659,784,1047].forEach((f,i)=>tone(f,i*.14,.35,'triangle',.16))},
+ fin(){[392,330,262].forEach((f,i)=>tone(f,i*.18,.35,'triangle',.14))}};
+function sndBtn(){const b=$('#snd');b.textContent=muted?'🔇 Sin sonido':'🔊 Sonido';b.setAttribute('aria-pressed',muted);b.setAttribute('aria-label',muted?'Activar sonido':'Silenciar sonido')}
+function setMute(m){muted=m;try{localStorage.setItem('sicmute',m?'1':'0')}catch(e){}sndBtn();if(!m)SFX.bell()}
+$('#snd').onclick=()=>setMute(!muted);
+sndBtn();
+
+let S;
+function start(){
+  S={score:100,errs:0,i:0,p1:null,items:[{pick:1}],docs:[],m:'Bienvenido, ¿qué te llevás hoy?',b:'Quiero comprar un electrodoméstico.'};
+  render();
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function upd(){
+  $('#sc').textContent=S.score+'%';
+  const b=$('#bar');b.style.width=S.score+'%';
+  b.style.background=S.score>=70?'var(--ok)':S.score>=40?'var(--tag)':'var(--bad)';
+  $('#mb').textContent=S.m;$('#bb').textContent=S.b;
+  $('#docs').innerHTML=S.docs.length?S.docs.map(d=>`<span>🧾 ${d}</span>`).join(''):'<em>Comprobantes emitidos: todavía ninguno</em>';
+}
+function render(){
+  const it=S.items[S.i];
+  if(!it){return end()}
+  if(it.pick){
+    upd();
+    const c=$('#card');
+    c.innerHTML=`<h2>${it.pick==1?'¿Qué querés comprar?':'Elegí el producto con el que lo vas a cambiar'}</h2><div class="opts">`+
+      Object.entries(PR).map(([k,p])=>`<button class="opt prod" data-k="${k}" ${S.p1===k?'disabled':''}><span class="e">${p.e}</span><span>${p.n}${S.p1===k?' (ya lo compraste)':''}</span></button>`).join('')+'</div>';
+    c.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(b.dataset.k,it.pick));
+    return;
+  }
+  if(it.s){S.m=it.s.m;S.b=it.s.b}
+  upd();
+  const c=$('#card');
+  const opts=shuffle(it.o.map((x,i)=>({x,ok:i===0})));
+  c.innerHTML=`<h2>${it.t}</h2><div class="opts">`+opts.map((o,i)=>`<button class="opt" data-i="${i}">${o.x}</button>`).join('')+'</div><div id="fb"></div>';
+  c.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(b,opts[b.dataset.i].ok,it));
+}
+function pick(k,n){
+  const p=PR[k];
+  SFX.bell();
+  S.i++;
+  if(n==1){
+    S.p1=k;S.items.push(...build1(p),...NC,{pick:2});
+    S.b=`Quiero ${p.e} ${p.n}.`;
+  }else{
+    S.items.push(...build2(p));S.b=`Entonces me llevo ${p.e} ${p.n}.`;
+  }
+  S.m='Ya es suyo, envío su compra a caja para que facture.';
+  render();
+}
+function answer(btn,ok,it){
+  const fb=$('#fb');
+  if(!ok){
+    btn.disabled=true;btn.classList.add('bad');
+    S.score=Math.max(0,S.score-10);S.errs++;upd();SFX.bad();
+    fb.className='fb no';fb.textContent='❌ Ese no es. Perdés 10%. Probá con otra opción.';
+    return;
+  }
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  btn.classList.add('good');
+  if(it.d)S.docs.push(it.d);
+  it.d==='Recibo'?SFX.cash():SFX.ok();
+  upd();
+  fb.className='fb ok';
+  fb.innerHTML=`✅ ¡Correcto! ${it.w}<br><button class="go" id="nx">Continuar</button>`;
+  $('#nx').focus();
+  $('#nx').onclick=()=>{S.i++;render()};
+}
+function end(){
+  upd();
+  const s=S.score;
+  const msg=s===100?'¡Circuito perfecto! Recorriste todos los documentos sin errores.':s>=70?'¡Muy bien! Conocés el circuito, repasá los documentos donde fallaste.':s>=40?'Aprobaste el recorrido, pero conviene repasar los documentos comerciales.':'Completaste el circuito. Volvé a intentarlo después de repasar los apuntes.';
+  (s===100?SFX.win:SFX.fin)();
+  S.m='¡Gracias por su compra!';S.b='¡Hasta pronto!';upd();
+  $('#card').innerHTML=`<div class="end"><h2>Fin del recorrido</h2><div class="big">${s}%</div><p>${msg}</p><p style="color:var(--mut)">Errores cometidos: ${S.errs} (cada uno descuenta 10%).</p><button class="go" id="again">Jugar de nuevo</button></div>`;
+  $('#again').onclick=start;
+}
+start();
+</script>
+</body>
+</html>
